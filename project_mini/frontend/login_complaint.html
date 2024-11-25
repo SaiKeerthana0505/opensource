@@ -143,9 +143,9 @@
 <body>
     <a href="index.html" class="btn-back">Back to Home</a>
     <div class="container">
-        <div class="icon">🌿</div>
+        <div class="icon">📄</div>
         <h2>Login to Continue</h2>
-        <form>
+        <form id="loginForm">
             <div class="form-group">
                 <label for="username">User ID</label>
                 <input type="text" id="username" placeholder="Enter your user ID" required>
@@ -154,9 +154,37 @@
                 <label for="password">Password</label>
                 <input type="password" id="password" placeholder="Enter your password" required>
             </div>
-          <a href="complaint .html"  button class="btn-login" type="submit">Login</button></a>
+            <button class="btn-login" type="submit">Login</button>
         </form>
+        <p id="error-message" style="color: red; margin-top: 15px; display: none;">Invalid User ID or Password</p>
     </div>
-    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const userId = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMessage = document.getElementById('error-message');
+
+            const userIdRegex = /^[a-zA-Z0-9]{5,12}$/; // Alphanumeric, 5-12 characters
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/; // Strong password
+
+            if (!userIdRegex.test(userId)) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'User ID must be 5-12 alphanumeric characters.';
+                return;
+            }
+
+            if (!passwordRegex.test(password)) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Password must be at least 8 characters, include uppercase, lowercase, a number, and a special character.';
+                return;
+            }
+
+            errorMessage.style.display = 'none';
+            alert('Login successful!');
+            window.location.href = 'complaint.html'; // Corrected file path
+        });
+    </script>
 </body>
 </html>
