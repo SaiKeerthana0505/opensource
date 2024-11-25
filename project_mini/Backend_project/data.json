@@ -1,14 +1,26 @@
 {
-  "suggestions": [
+  "users": [
     {
-      "id": 1732450532654,
-      "suggestion": "Improve campus recycling facilities."
+      "id": "user1",
+      "password": "password123"
+    },
+    {
+      "id": "user2",
+      "password": "password456"
     }
   ],
-  "complaints": [
+  "complaints":
     {
-      "id": 1732450751063,
-      "complaint": "The Wi-Fi in the library is very slow."
+      "userId": "user1",
+      "complaint": "The Wi-Fi is not working in the library.",
+      "date": "2024-11-25T09:24:46.210Z"
+    }
+  ],
+  "suggestions": [
+    {
+      "userId": "user1",
+      "suggestion": "Please add more chairs in the cafeteria.",
+      "date": "2024-11-25T09:25:55.697Z"
     }
   ]
 }

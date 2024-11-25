@@ -1,87 +1,116 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
-
-// Initialize Express app
+const express = require("express");
+const fs = require("fs");
+const bodyParser = require("body-parser");
+const cors = require("cors");
 const app = express();
 const port = 3000;
 
-// Enable CORS for all routes
+// Middleware
 app.use(cors());
+app.use(bodyParser.json()); // For parsing JSON request body
 
-// Middleware to parse JSON request bodies
-app.use(bodyParser.json());
+// Path to the JSON file
+const dataFilePath = "./data.json";
 
-// Path to the data.json file for storing suggestions and complaints
-const dataFilePath = path.join(__dirname, 'data.json');
-
-// Read data from data.json
-const readData = () => {
-  try {
-    const data = fs.readFileSync(dataFilePath, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error("Error reading data file", error);
-    return { suggestions: [], complaints: [] }; // Default structure if the file doesn't exist
+// Utility function to read data from JSON file
+function readData() {
+  if (!fs.existsSync(dataFilePath)) {
+    return { users: [], complaints: [], suggestions: [] };
   }
-};
+  const fileData = fs.readFileSync(dataFilePath, "utf-8");
+  return JSON.parse(fileData || "{}") || { users: [], complaints: [], suggestions: [] };
+}
 
-// Write data to data.json
-const writeData = (data) => {
-  try {
-    fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2), 'utf-8');
-  } catch (error) {
-    console.error("Error writing to data file", error);
-  }
-};
+// Utility function to write data to JSON file
+function writeData(data) {
+  fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2), "utf-8");
+}
 
-// Route to add a suggestion
-app.post('/suggestions', (req, res) => {
-  const { suggestion } = req.body;
+// Initialize data if JSON file is empty or doesn't exist
+const initialData = readData();
+if (!initialData.users.length) {
+  initialData.users = [
+    { id: "user1", password: "password123" },
+    { id: "user2", password: "password456" },
+  ];
+  writeData(initialData);
+}
 
-  if (!suggestion) {
-    return res.status(400).json({ message: "Suggestion is required." });
-  }
-
+// Authentication middleware
+function authenticate(req, res, next) {
+  const { userId, password } = req.body;
   const data = readData();
-  const newSuggestion = { id: Date.now(), suggestion };
-  data.suggestions.push(newSuggestion);
-  writeData(data);
 
-  res.status(201).json({ message: 'Suggestion added successfully', suggestion: newSuggestion });
+  const user = data.users.find((u) => u.id === userId && u.password === password);
+  if (!user) {
+    return res.status(401).json({ message: "Authentication failed" });
+  }
+  next();
+}
+
+// Routes
+// 1. Login Endpoint
+app.post("/login", (req, res) => {
+  const { userId, password } = req.body;
+  const data = readData();
+
+  const user = data.users.find((u) => u.id === userId && u.password === password);
+  if (!user) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
+
+  res.status(200).json({ message: "Login successful" });
 });
 
-// Route to add a complaint
-app.post('/complaints', (req, res) => {
-  const { complaint } = req.body;
-
+// 2. Complaint Submission Endpoint
+app.post("/submit-complaint", authenticate, (req, res) => {
+  const { userId, complaint } = req.body;
   if (!complaint) {
-    return res.status(400).json({ message: "Complaint is required." });
+    return res.status(400).json({ message: "Complaint cannot be empty" });
   }
 
   const data = readData();
-  const newComplaint = { id: Date.now(), complaint };
+  const newComplaint = { userId, complaint, date: new Date().toISOString() };
   data.complaints.push(newComplaint);
   writeData(data);
 
-  res.status(201).json({ message: 'Complaint filed successfully', complaint: newComplaint });
+  res.status(201).json({
+    message: "Complaint submitted successfully",
+    complaint: newComplaint,
+  });
 });
 
-// Route to get all suggestions
-app.get('/suggestions', (req, res) => {
+// 3. Suggestion Submission Endpoint
+app.post("/submit-suggestion", authenticate, (req, res) => {
+  const { userId, suggestion } = req.body;
+  if (!suggestion) {
+    return res.status(400).json({ message: "Suggestion cannot be empty" });
+  }
+
   const data = readData();
-  res.json(data.suggestions);
+  const newSuggestion = { userId, suggestion, date: new Date().toISOString() };
+  data.suggestions.push(newSuggestion);
+  writeData(data);
+
+  res.status(201).json({
+    message: "Suggestion submitted successfully",
+    suggestion: newSuggestion,
+  });
 });
 
-// Route to get all complaints
-app.get('/complaints', (req, res) => {
+// 4. View Complaints
+app.get("/view-complaints", (req, res) => {
   const data = readData();
-  res.json(data.complaints);
+  res.status(200).json({ complaints: data.complaints });
+});
+
+// 5. View Suggestions
+app.get("/view-suggestions", (req, res) => {
+  const data = readData();
+  res.status(200).json({ suggestions: data.suggestions });
 });
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server running on http://localhost:${port}`);
 });
