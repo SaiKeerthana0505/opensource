@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sustainable Campus Initiative</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+
+        :root {
+            --leaf-green: #4CAF50;
+            --forest-green: #2E7D32;
+            --spring-green: #A5D6A7;
+            --earth-brown: #795548;
+            --sky-blue: #B3E5FC;
+            --sunshine: #FFD54F;
+            --natural-white: #F5F5F5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: 
+                linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 20c5.523 0 10 4.477 10 10s-4.477 10-10 10-10-4.477-10-10 4.477-10 10-10zm0 2c4.418 0 8 3.582 8 8s-3.582 8-8 8-8-3.582-8-8 3.582-8 8-8zM15 30c2.761 0 5 2.239 5 5s-2.239 5-5 5-5-2.239-5-5 2.239-5 5-5zm0 2c1.657 0 3 1.343 3 3s-1.343 3-3 3-3-1.343-3-3 1.343-3 3-3z' fill='%234CAF50' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+
+        /* Leaf Animation */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        /* Natural Border */
+        .natural-border {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .natural-border::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--leaf-green), var(--spring-green), var(--leaf-green));
+        }
+
+        /* Navigation */
+        .nav-container {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 1.5rem;
+            color: var(--forest-green);
+        }
+
+        .logo i {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.95), rgba(46, 125, 50, 0.95)),
+                        url("/api/placeholder/1200/600");
+            padding: 6rem 2rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leaf-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0C22.4 0 0 22.4 0 50s22.4 50 50 50 50-22.4 50-50S77.6 0 50 0zm0 90C27.9 90 10 72.1 10 50S27.9 10 50 10s40 17.9 40 40-17.9 40-40 40z' fill='%23ffffff' fill-opacity='0.1'/%3E%3C/svg%3E");
+            opacity: 0.1;
+        }
+
+        /* Eco Stats Cards */
+        .eco-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .eco-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .eco-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--leaf-green), var(--spring-green));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .eco-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .eco-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        /* Progress Circles */
+        .progress-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(var(--leaf-green) var(--progress), #eee 0deg);
+            margin: 2rem auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-circle::before {
+            content: '';
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .progress-value {
+            position: relative;
+            font-size: 2rem;
+            color: var(--forest-green);
+            font-weight: bold;
+        }
+
+        /* Initiative Cards */
+        .initiative-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 3fr));
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .initiative-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .initiative-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .initiative-image {
+            height: 450px;
+            background: var(--spring-green);
+            position: middle;
+            overflow: hidden;
+        }
+
+        .initiative-content {
+            padding: 2rem;
+        }
+
+        /* Nature-inspired Button */
+        .eco-btn {
+            background: linear-gradient(135deg, var(--leaf-green), var(--forest-green));
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .eco-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: all 0.5s ease;
+        }
+
+        .eco-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--forest-green);
+            color: white;
+            padding: 4rem 2rem;
+            margin-top: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 20c5.523 0 10 4.477 10 10s-4.477 10-10 10-10-4.477-10-10 4.477-10 10-10zm0 2c4.418 0 8 3.582 8 8s-3.582 8-8 8-8-3.582-8-8 3.582-8 8-8z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.1;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 4rem 1rem;
+            }
+
+            .eco-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .initiative-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="nav-container">
+        <nav>
+            <a href="#" class="logo">
+                <i class="fas fa-leaf"></i>
+                <span>EcoCampus</span>
+            </a>
+            <!-- Navigation content -->
+        </nav>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="leaf-pattern"></div>
+        <h1>Building a Sustainable Future</h1>
+        <p>Together we can create a greener tomorrow</p>
+        <div class="hero-stats">
+            <!-- Hero content -->
+        </div>
+    </section>
+
+    <!-- Eco Stats -->
+    <section class="eco-stats">
+        <div class="eco-card" data-aos="fade-up">
+            <div class="progress-circle" style="--progress: 75%;">
+                <span class="progress-value">75%</span>
+            </div>
+            <h3>Renewable Energy</h3>
+            <p>Of our campus power comes from renewable sources</p>
+        </div>
+        <!-- More eco cards -->
+    </section>
+
+    <!-- Initiatives -->
+    <section class="initiative-grid">
+        <div class="initiative-card" data-aos="fade-up">
+            <div class="initiative-image">
+                <img src="https://edu.ieee.org/in-vnrvjiet/wp-content/uploads/sites/764/vnr-1024x448.jpg" alt="Solar Initiative">
+            </div>
+            <div class="initiative-content">
+                <h3>Sustainability starts with you</h3>
+            </div>
+        </div>
+        <!-- More initiative cards -->
+    </section>
+    <section style="text-align: centre; padding: 3rem; box-shadow: 0  10px 30px rgba(0, 0, 0, 0.1);">
+        <h2>Discover Sustainability at Our Campus</h2>
+        <p>
+            Learn how our campus integrates sustainability into everyday life, from conserving energy to maintaining greenery.
+        </p>
+        <button class="eco-btn" id="learn-more-btn" onclick="location.href='campus-details.html';">
+            Learn More
+        </button>
+    </section>
+    
+
+<!-- Add this section below your hero or initiative-grid section -->
+<section style="text-align: center; padding: 2rem;">
+    <button class="eco-btn" id="suggestion-btn">Suggestion</button>
+    <button class="eco-btn" id="complaint-btn">Complaint</button>
+</section>
+
+<!-- Login Popup -->
+<div id="login-popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); border-radius: 20px; z-index: 1000;">
+    <h3 style="margin-bottom: 1rem;">Login</h3>
+    <form id="login-form">
+        <label for="user-id">User ID</label><br>
+        <input type="text" id="user-id" name="user-id" style="width: 100%; padding: 0.5rem; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 10px;"><br>
+        <label for="password">Password</label><br>
+        <input type="password" id="password" name="password" style="width: 100%; padding: 0.5rem; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 10px;"><br>
+        <button type="button" class="eco-btn" id="login-submit">Submit</button>
+        <button type="button" class="eco-btn" style="background: var(--earth-brown);" id="login-cancel">Cancel</button>
+    </form>
+</div>
+
+<!-- Overlay for popup -->
+<div id="overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 999;"></div>
+
+<script>
+    // JavaScript to handle popup behavior
+    const complaintBtn = document.getElementById('complaint-btn');
+    const suggestionBtn = document.getElementById('suggestion-btn');  // Added for Suggestion button
+    const loginPopup = document.getElementById('login-popup');
+    const overlay = document.getElementById('overlay');
+    const loginCancel = document.getElementById('login-cancel');
+
+    // Show popup when Complaint button is clicked
+    complaintBtn.addEventListener('click', () => {
+        loginPopup.style.display = 'block';
+        overlay.style.display = 'block';
+    });
+
+    // Show popup when Suggestion button is clicked
+    suggestionBtn.addEventListener('click', () => {
+        loginPopup.style.display = 'block';
+        overlay.style.display = 'block';
+    });
+
+    // Close popup when Cancel button or overlay is clicked
+    loginCancel.addEventListener('click', () => {
+        loginPopup.style.display = 'none';
+        overlay.style.display = 'none';
+    });
+
+    // Close popup if clicking outside of it
+    overlay.addEventListener('click', () => {
+        loginPopup.style.display = 'none';
+        overlay.style.display = 'none';
+    });
+
+    // Optional: Handle login submission (for demonstration)
+    const loginSubmit = document.getElementById('login-submit');
+    loginSubmit.addEventListener('click', () => {
+        alert('Login form submitted!');
+        loginPopup.style.display = 'none';
+        overlay.style.display = 'none';
+    });
+</script>
+    <!-- Footer -->
+    <footer>
+        <div class="footer-pattern"></div>
+        <div class="footer-content">
+            <!-- Footer content -->
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true
+        });
+    </script>
+</body>
+</html>
