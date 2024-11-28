@@ -1,120 +1,138 @@
-const express = require("express");
-const fs = require("fs");
-const bodyParser = require("body-parser");
-const cors = require("cors");
+const express = require('express');
+const cors = require('cors');
+const fs = require('fs');
+const bodyParser = require('body-parser');
 const app = express();
-const port = 3000;
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json()); // For parsing JSON request body
+app.use(bodyParser.json());
 
-// File paths
-const loginFilePath = "./login.json";
-const complaintsFilePath = "./complaints.json";
-const suggestionsFilePath = "./suggestions.json";
+// Data files
+const signupFile = './data/signup.json'; // Updated to signup.json
+const complaintsFile = './data/complaints.json';
+const suggestionsFile = './data/suggestions.json';
 
-// Utility function to read data from JSON files
-function readData(filePath) {
-  if (!fs.existsSync(filePath)) {
-    return [];
+// Read data from files (helper function)
+const readDataFromFile = (filePath) => {
+  if (fs.existsSync(filePath)) {
+    const data = fs.readFileSync(filePath);
+    return JSON.parse(data);
   }
-  const fileData = fs.readFileSync(filePath, "utf-8");
-  return JSON.parse(fileData || "[]");
-}
+  return [];
+};
 
-// Utility function to write data to JSON files
-function writeData(filePath, data) {
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
-}
+// Write data to files (helper function)
+const writeDataToFile = (filePath, data) => {
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+};
 
-// Initialize data if JSON files are empty or don't exist
-const initialLoginData = readData(loginFilePath);
-if (!initialLoginData.length) {
-  const defaultUsers = [
-    { id: "user1", password: "password123" },
-    { id: "user2", password: "password456" },
-  ];
-  writeData(loginFilePath, defaultUsers);
-}
-
-// Authentication middleware
-function authenticate(req, res, next) {
-  const { userId, password } = req.body;
-  const users = readData(loginFilePath);
-
-  console.log('Authentication check for:', userId); // Debugging line to check userId
-
-  const user = users.find((u) => u.id === userId && u.password === password);
-  if (!user) {
-    return res.status(401).json({ message: "Authentication failed" });
-  }
-  next();
-}
-
-// Routes
-// 1. Login Endpoint
-app.post("/login", (req, res) => {
-  const { userId, password } = req.body;
-  const users = readData(loginFilePath);
-
-  const user = users.find((u) => u.id === userId && u.password === password);
-  if (!user) {
-    return res.status(401).json({ message: "Invalid credentials" });
+// Signup endpoint (Registers a user)
+app.post('/signup', (req, res) => {
+  const { name, email, password } = req.body;
+  
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: 'Please provide all fields (name, email, password)' });
   }
 
-  res.status(200).json({ message: "Login successful" });
+  const users = readDataFromFile(signupFile); // Updated to signupFile
+  
+  // Check if email already exists
+  const userExists = users.some(user => user.email === email);
+  if (userExists) {
+    return res.status(400).json({ message: 'User with this email already exists' });
+  }
+
+  // Add new user to the users array
+  const newUser = { name, email, password };
+  users.push(newUser);
+  
+  // Write the updated users array to the file
+  writeDataToFile(signupFile, users); // Updated to signupFile
+
+  res.status(201).json({ message: 'User registered successfully' });
 });
 
-// 2. Complaint Submission Endpoint
-app.post("/submit-complaint", authenticate, (req, res) => {
-  const { userId, complaint } = req.body;
-  if (!complaint) {
-    return res.status(400).json({ message: "Complaint cannot be empty" });
+// Login endpoint (Logs in a user)
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+  
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Please provide email and password' });
   }
 
-  const complaints = readData(complaintsFilePath);
-  const newComplaint = { userId, complaint, date: new Date().toISOString() };
+  const users = readDataFromFile(signupFile); // Updated to signupFile
+  
+  const user = users.find(user => user.email === email && user.password === password);
+  if (!user) {
+    return res.status(401).json({ message: 'Invalid credentials' });
+  }
+
+  res.status(200).json({ message: 'Login successful', email });
+});
+
+// Complaints endpoint (Submit a complaint)
+app.post('/complaints', (req, res) => {
+  const { email, password, complaintText } = req.body;
+
+  if (!email || !password || !complaintText) {
+    return res.status(400).json({ message: 'Please provide email, password, and complaint text' });
+  }
+
+  const users = readDataFromFile(signupFile); // Updated to signupFile
+  
+  const user = users.find(user => user.email === email && user.password === password);
+  if (!user) {
+    return res.status(401).json({ message: 'Invalid email or password' });
+  }
+
+  const complaints = readDataFromFile(complaintsFile);
+  const newComplaint = { email, complaintText, date: new Date() };
   complaints.push(newComplaint);
-  writeData(complaintsFilePath, complaints);
 
-  res.status(201).json({
-    message: "Complaint submitted successfully",
-    complaint: newComplaint,
-  });
+  writeDataToFile(complaintsFile, complaints);
+
+  res.status(201).json({ message: 'Complaint submitted successfully' });
 });
 
-// 3. Suggestion Submission Endpoint
-app.post("/submit-suggestion", authenticate, (req, res) => {
-  const { userId, suggestion } = req.body;
-  if (!suggestion) {
-    return res.status(400).json({ message: "Suggestion cannot be empty" });
+// Suggestions endpoint (Submit a suggestion)
+app.post('/suggestions', (req, res) => {
+  const { email, password, suggestionText } = req.body;
+
+  if (!email || !password || !suggestionText) {
+    return res.status(400).json({ message: 'Please provide email, password, and suggestion text' });
   }
 
-  const suggestions = readData(suggestionsFilePath);
-  const newSuggestion = { userId, suggestion, date: new Date().toISOString() };
+  const users = readDataFromFile(signupFile); // Updated to signupFile
+
+  const user = users.find(user => user.email === email && user.password === password);
+  if (!user) {
+    return res.status(401).json({ message: 'Invalid email or password' });
+  }
+
+  const suggestions = readDataFromFile(suggestionsFile);
+  const newSuggestion = { email, suggestionText, date: new Date() };
   suggestions.push(newSuggestion);
-  writeData(suggestionsFilePath, suggestions);
 
-  res.status(201).json({
-    message: "Suggestion submitted successfully",
-    suggestion: newSuggestion,
-  });
+  writeDataToFile(suggestionsFile, suggestions);
+
+  res.status(201).json({ message: 'Suggestion submitted successfully' });
 });
 
-// 4. View Complaints
-app.get("/view-complaints", (req, res) => {
-  const complaints = readData(complaintsFilePath);
-  res.status(200).json({ complaints });
+// Get all complaints (for testing)
+app.get('/complaints', (req, res) => {
+  const complaints = readDataFromFile(complaintsFile);
+  res.status(200).json(complaints);
 });
 
-// 5. View Suggestions
-app.get("/view-suggestions", (req, res) => {
-  const suggestions = readData(suggestionsFilePath);
-  res.status(200).json({ suggestions });
+// Get all suggestions (for testing)
+app.get('/suggestions', (req, res) => {
+  const suggestions = readDataFromFile(suggestionsFile);
+  res.status(200).json(suggestions);
 });
 
 // Start the server
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });

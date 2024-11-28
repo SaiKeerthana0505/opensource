@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Sign Up</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -103,7 +103,7 @@
             box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
         }
 
-        .btn-login {
+        .btn-signup {
             width: 100%;
             padding: 12px;
             background: var(--primary-color);
@@ -117,7 +117,7 @@
             margin-top: 15px;
         }
 
-        .btn-login:hover {
+        .btn-signup:hover {
             background: var(--button-hover);
         }
 
@@ -144,34 +144,37 @@
     <a href="index.html" class="btn-back">Back to Home</a>
     <div class="container">
         <div class="icon">🌿</div>
-        <h2>Login to Continue</h2>
-        <form id="loginForm">
+        <h2>Sign Up</h2>
+        <form id="signupForm">
             <div class="form-group">
-                <label for="username">User ID</label>
-                <input type="text" id="username" placeholder="Enter your user ID" required>
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email address" required>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter your password" required>
+                <input type="password" id="password" placeholder="Create a password" required>
             </div>
-            <button class="btn-login" type="submit">Login</button>
+            <button class="btn-signup" type="submit">Sign Up</button>
         </form>
-        <p id="error-message" style="color: red; margin-top: 15px; display: none;">Invalid User ID or Password</p>
+        <p id="error-message" style="color: red; margin-top: 15px; display: none;">Please enter a valid email and password.</p>
+        <div class="footer-note">
+            <p>Already have an account? <a href="login.html">Login here</a></p>
+        </div>
     </div>
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function (e) {
+        document.getElementById('signupForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
-            const userId = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
             const errorMessage = document.getElementById('error-message');
 
-            const userIdRegex = /^[a-zA-Z0-9]{5,12}$/; // Alphanumeric, 5-12 characters
+            const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/; // Email format
             const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/; // Strong password
 
-            if (!userIdRegex.test(userId)) {
+            if (!emailRegex.test(email)) {
                 errorMessage.style.display = 'block';
-                errorMessage.textContent = 'User ID must be 5-12 alphanumeric characters.';
+                errorMessage.textContent = 'Please enter a valid email address.';
                 return;
             }
 
@@ -182,8 +185,8 @@
             }
 
             errorMessage.style.display = 'none';
-            alert('Login successful!');
-            window.location.href = 'complaint.html'; // Corrected file path
+            alert('Sign-up successful!');
+            window.location.href = 'welcome.html'; // Redirect to welcome page
         });
     </script>
 </body>
