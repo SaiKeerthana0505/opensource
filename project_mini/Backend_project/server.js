@@ -9,39 +9,43 @@ const port = 3000;
 app.use(cors());
 app.use(bodyParser.json()); // For parsing JSON request body
 
-// Path to the JSON file
-const dataFilePath = "./data.json";
+// File paths
+const loginFilePath = "./login.json";
+const complaintsFilePath = "./complaints.json";
+const suggestionsFilePath = "./suggestions.json";
 
-// Utility function to read data from JSON file
-function readData() {
-  if (!fs.existsSync(dataFilePath)) {
-    return { users: [], complaints: [], suggestions: [] };
+// Utility function to read data from JSON files
+function readData(filePath) {
+  if (!fs.existsSync(filePath)) {
+    return [];
   }
-  const fileData = fs.readFileSync(dataFilePath, "utf-8");
-  return JSON.parse(fileData || "{}") || { users: [], complaints: [], suggestions: [] };
+  const fileData = fs.readFileSync(filePath, "utf-8");
+  return JSON.parse(fileData || "[]");
 }
 
-// Utility function to write data to JSON file
-function writeData(data) {
-  fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2), "utf-8");
+// Utility function to write data to JSON files
+function writeData(filePath, data) {
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
 }
 
-// Initialize data if JSON file is empty or doesn't exist
-const initialData = readData();
-if (!initialData.users.length) {
-  initialData.users = [
+// Initialize data if JSON files are empty or don't exist
+const initialLoginData = readData(loginFilePath);
+if (!initialLoginData.length) {
+  const defaultUsers = [
     { id: "user1", password: "password123" },
     { id: "user2", password: "password456" },
   ];
-  writeData(initialData);
+  writeData(loginFilePath, defaultUsers);
 }
 
 // Authentication middleware
 function authenticate(req, res, next) {
   const { userId, password } = req.body;
-  const data = readData();
+  const users = readData(loginFilePath);
 
-  const user = data.users.find((u) => u.id === userId && u.password === password);
+  console.log('Authentication check for:', userId); // Debugging line to check userId
+
+  const user = users.find((u) => u.id === userId && u.password === password);
   if (!user) {
     return res.status(401).json({ message: "Authentication failed" });
   }
@@ -52,9 +56,9 @@ function authenticate(req, res, next) {
 // 1. Login Endpoint
 app.post("/login", (req, res) => {
   const { userId, password } = req.body;
-  const data = readData();
+  const users = readData(loginFilePath);
 
-  const user = data.users.find((u) => u.id === userId && u.password === password);
+  const user = users.find((u) => u.id === userId && u.password === password);
   if (!user) {
     return res.status(401).json({ message: "Invalid credentials" });
   }
@@ -69,10 +73,10 @@ app.post("/submit-complaint", authenticate, (req, res) => {
     return res.status(400).json({ message: "Complaint cannot be empty" });
   }
 
-  const data = readData();
+  const complaints = readData(complaintsFilePath);
   const newComplaint = { userId, complaint, date: new Date().toISOString() };
-  data.complaints.push(newComplaint);
-  writeData(data);
+  complaints.push(newComplaint);
+  writeData(complaintsFilePath, complaints);
 
   res.status(201).json({
     message: "Complaint submitted successfully",
@@ -87,10 +91,10 @@ app.post("/submit-suggestion", authenticate, (req, res) => {
     return res.status(400).json({ message: "Suggestion cannot be empty" });
   }
 
-  const data = readData();
+  const suggestions = readData(suggestionsFilePath);
   const newSuggestion = { userId, suggestion, date: new Date().toISOString() };
-  data.suggestions.push(newSuggestion);
-  writeData(data);
+  suggestions.push(newSuggestion);
+  writeData(suggestionsFilePath, suggestions);
 
   res.status(201).json({
     message: "Suggestion submitted successfully",
@@ -100,14 +104,14 @@ app.post("/submit-suggestion", authenticate, (req, res) => {
 
 // 4. View Complaints
 app.get("/view-complaints", (req, res) => {
-  const data = readData();
-  res.status(200).json({ complaints: data.complaints });
+  const complaints = readData(complaintsFilePath);
+  res.status(200).json({ complaints });
 });
 
 // 5. View Suggestions
 app.get("/view-suggestions", (req, res) => {
-  const data = readData();
-  res.status(200).json({ suggestions: data.suggestions });
+  const suggestions = readData(suggestionsFilePath);
+  res.status(200).json({ suggestions });
 });
 
 // Start the server
