@@ -4,6 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Complaint</title>
+    <script>
+        // Handle form submission
+        const form = document.querySelector('form'); // Select the form
+      
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault(); // Prevent page reload on form submission
+      
+          // Collect the form data
+          const complaintText = form.complaint.value;
+          const email = prompt("Enter your email:"); // Ask for email
+          const password = prompt("Enter your password:"); // Ask for password
+      
+          if (!email || !password) {
+            alert("Email and password are required to submit a complaint.");
+            return;
+          }
+      
+          // Send the data to the backend
+          try {
+            const response = await fetch('/complaint', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email, password, complaintText }),
+            });
+      
+            const result = await response.json();
+      
+            if (response.ok) {
+              alert("Complaint submitted successfully!");
+              form.reset(); // Clear the form
+            } else {
+              alert(`Error: ${result.message}`);
+            }
+          } catch (error) {
+            console.error("Error submitting complaint:", error);
+            alert("An error occurred. Please try again.");
+          }
+        });
+      </script>
+      
     <style>
         /* General Body Styles */
         body {
@@ -161,6 +203,57 @@
                 <button type="submit" class="button">Submit Complaint</button>
             </form>
         </div>
+        <script>
+            document.querySelector("form").addEventListener("submit", async function (event) {
+                event.preventDefault(); // Prevent the default form submission
+        
+                const complaintText = document.querySelector('textarea[name="complaint"]').value;
+        
+                // Retrieve email and password from localStorage
+                const email = localStorage.getItem("email");
+                const password = localStorage.getItem("password");
+        
+                if (!email || !password) {
+                    alert("No user credentials found. Please sign up or log in first.");
+                    return;
+                }
+        
+                if (!complaintText) {
+                    alert("Please write a complaint.");
+                    return;
+                }
+        
+                const complaintData = {
+                    email: email,
+                    password: password,
+                    complaintText: complaintText,
+                };
+        
+                try {
+                    const response = await fetch("http://localhost:3000/complaint", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(complaintData),
+                    });
+        
+                    const result = await response.json();
+        
+                    if (response.ok) {
+                        alert(result.message || "Complaint submitted successfully.");
+                        document.querySelector("textarea[name='complaint']").value = ""; // Clear the complaint textarea
+                    } else {
+                        alert(result.message || "Failed to submit complaint.");
+                    }
+                } catch (error) {
+                    console.error("Error during complaint submission:", error);
+                    alert("An error occurred. Please try again later.");
+                }
+            });
+        </script>
+        
+        
     </section>
 
     <!-- Footer -->

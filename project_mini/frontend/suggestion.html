@@ -148,18 +148,74 @@
         <div class="form-card">
             <h2>Submit Your Suggestion</h2>
             <p>We value your input in making our campus better.</p>
-            <form action="http://localhost:3000/suggestions" method="POST">
+            <form action="#" method="POST">
                 <textarea 
                     name="suggestion" 
                     rows="6" 
                     placeholder="Write your suggestion here..." 
                     class="input-box" 
-                    required></textarea>
+                    required>
+                </textarea>
                 <button type="submit" class="button">Submit Suggestion</button>
             </form>
+
+            
         </div>
+        <script>
+            document.querySelector("form").addEventListener("submit", async function(event) {
+                event.preventDefault(); // Prevent the default form submission
+        
+                const suggestionText = document.querySelector('textarea[name="suggestion"]').value;
+        
+                // Retrieve email and password from localStorage
+                const email = localStorage.getItem("email");
+                const password = localStorage.getItem("password");
+        
+                if (!email || !password) {
+                    alert("No user credentials found. Please sign up or log in first.");
+                    return;
+                }
+        
+                if (!suggestionText) {
+                    alert("Please write a suggestion.");
+                    return;
+                }
+        
+                // Create the suggestion data payload
+                const suggestionData = {
+                    email: email,
+                    password: password,
+                    suggestionText: suggestionText
+                };
+        
+                try {
+                    // Send POST request to the backend suggestion API
+                    const response = await fetch('http://localhost:3000/suggestion', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(suggestionData)
+                    });
+        
+                    const result = await response.json();
+        
+                    if (response.ok) {
+                        alert(result.message || "Suggestion submitted successfully.");
+                        // Optionally, you can clear the form or redirect the user
+                        document.querySelector('textarea[name="suggestion"]').value = ''; // Clear the suggestion textarea
+                    } else {
+                        alert(result.message || "Failed to submit suggestion.");
+                    }
+                } catch (error) {
+                    console.error("Error during suggestion submission:", error);
+                    alert("An error occurred. Please try again later.");
+                }
+            });
+        </script>
+        
+        
     </section>
-    
 
     <!-- Footer -->
     <footer>

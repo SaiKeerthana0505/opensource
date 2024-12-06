@@ -1,6 +1,22 @@
 [
   {
-    "complaint": "The air conditioning in the library is too cold",
-    "timestamp": "2024-11-28T18:15:51.236Z"
+    "email": "alice@example.com",
+    "complaintText": "Fix broken lights in the library.",
+    "date": "2024-12-06T13:02:26.421Z"
+  },
+  {
+    "email": "aruck1635@gmail.com",
+    "complaintText": "               collage premises is not clean ",
+    "date": "2024-12-06T18:50:55.917Z"
+  },
+  {
+    "email": "aruck1635@gmail.com",
+    "complaintText": "                schedule is very busy",
+    "date": "2024-12-06T19:01:09.715Z"
+  },
+  {
+    "email": "luna@gmail.com",
+    "complaintText": "no proper food availability",
+    "date": "2024-12-06T19:38:54.403Z"
   }
 ]

@@ -162,31 +162,52 @@
         </div>
     </div>
     <script>
-        document.getElementById('signupForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const errorMessage = document.getElementById('error-message');
-
-            const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/; // Email format
-            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/; // Strong password
-
-            if (!emailRegex.test(email)) {
-                errorMessage.style.display = 'block';
-                errorMessage.textContent = 'Please enter a valid email address.';
+        document.getElementById("signupForm").addEventListener("submit", async (event) => {
+            event.preventDefault(); // Prevent the default form submission behavior
+    
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+    
+            // Basic input validation
+            if (!email || !password) {
+                document.getElementById("error-message").style.display = "block";
+                document.getElementById("error-message").textContent = "Please enter a valid email and password.";
                 return;
             }
-
-            if (!passwordRegex.test(password)) {
-                errorMessage.style.display = 'block';
-                errorMessage.textContent = 'Password must be at least 8 characters, include uppercase, lowercase, a number, and a special character.';
-                return;
+            document.getElementById("error-message").style.display = "none";
+    
+            const signupData = {
+                name: "Default User", // Replace this with an input field if needed
+                email: email,
+                password: password,
+            };
+    
+            try {
+                const response = await fetch("http://localhost:3000/signup", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(signupData),
+                });
+    
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(result.message);
+    
+                    // Store email and password in localStorage
+                    localStorage.setItem("email", email);
+                    localStorage.setItem("password", password);
+    
+                    window.location.href = "login.html"; // Redirect to the login page
+                } else {
+                    const error = await response.json();
+                    alert(error.message);
+                }
+            } catch (err) {
+                console.error("Error during signup:", err);
+                alert("An error occurred while signing up. Please try again later.");
             }
-
-            errorMessage.style.display = 'none';
-            alert('Sign-up successful!');
-            window.location.href = 'welcome.html'; // Redirect to welcome page
         });
     </script>
 </body>
