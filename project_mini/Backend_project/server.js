@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const bodyParser = require('body-parser');
+const { clearScreenDown } = require('readline');
 const app = express();
 
 // Middleware
@@ -111,18 +112,6 @@ app.post('/complaint', (req, res) => {
   writeDataToFile(complaintFile, complaints);
 
   res.status(201).json({ message: 'Complaint submitted successfully.' });
-});
-
-// ** View Suggestions API **
-app.get('/view-suggestions', (req, res) => {
-  const suggestions = readDataFromFile(suggestionFile);
-  res.status(200).json(suggestions);
-});
-
-// ** View Complaints API **
-app.get('/view-complaints', (req, res) => {
-  const complaints = readDataFromFile(complaintFile);
-  res.status(200).json(complaints);
 });
 
 // ** Server Setup **
