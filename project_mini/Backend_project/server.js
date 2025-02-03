@@ -1,30 +1,30 @@
-const express = require('express');
-const cors = require('cors');
-const fs = require('fs');
-const bodyParser = require('body-parser');
-const { clearScreenDown } = require('readline');
-const app = express();
+const express = require('express');//it is used to import express(to create server).
+const cors = require('cors');//this is used to import cors modules.(extract inform from request body)
+const fs = require('fs');//importing file systems (can used for operation on file ).
+const bodyParser = require('body-parser');//importing body parsers (extract information from request body )
+const { clearScreenDown } = require('readline');//importing readline module 
+const app = express();// creating  app from express server
 
 // Middleware
-app.use(cors());
-app.use(bodyParser.json());
+app.use(cors());//data transfers between browsers and servers. 
+app.use(bodyParser.json());//Handling incoming data in a variety of formats, such as JSON, URL-encoded form data, and raw or text data.
 
 // File paths
-const signupFile = './signup.json';
-const loginFile = './login.json';
-const suggestionFile = './suggestion.json';
-const complaintFile = './complaint.json';
+const signupFile = './signup.json';//import signup.json file
+const loginFile = './login.json';//import login.json file
+const suggestionFile = './suggestion.json';//import suggestion.json file
+const complaintFile = './complaint.json';//import complaint.json file
 
 // Helper functions to read/write JSON data
 const readDataFromFile = (filePath) => {
   try {
     if (fs.existsSync(filePath)) {
-      const data = fs.readFileSync(filePath, 'utf-8');
+      const data = fs.readFileSync(filePath, 'utf-8');//read file 
       return data ? JSON.parse(data) : []; // Handle empty files
     }
     return [];
   } catch (error) {
-    console.error(`Error reading ${filePath}:`, error.message);
+    console.error(`Error reading ${filePath}:`, error.message);//to know error
     return [];
   }
 };
@@ -82,7 +82,6 @@ app.post('/suggestion', (req, res) => {
   if (!email || !password || !suggestionText) {
     return res.status(400).json({ message: 'All fields are required (email, password, suggestionText).' });
   }
-
   const users = readDataFromFile(signupFile);
   if (!users.find((user) => user.email === email && user.password === password)) {
     return res.status(401).json({ message: 'Invalid email or password.' });
